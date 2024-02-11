@@ -15,7 +15,7 @@ main {
     max-width: 1200px; /* O el ancho que prefieras */
     margin: auto; /* Centra el 'main' en la página */
     background-color: #ffffff; /* Fondo blanco para el contenido */
-    height: 600px;
+    height: 700px;
     border-radius: 8px; /* Bordes redondeados para el 'main' */
     box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Sombra suave para dar profundidad */
     overflow: hidden; /* Asegura que el borde redondeado contenga todo el contenido */
