@@ -1,44 +1,31 @@
 <!DOCTYPE html>
-<html lang="">
-
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>InfoVis Assignment</title>
-  <style>
-    body {
-      padding: 0;
-      margin: 0;
-      background-color: #1b1b1b;
-    }
-  </style>
-  <script src="./p5.min.js"></script>
-  <!-- <script src="../addons/p5.sound.js"></script> -->
-  <script src="sketch.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harbours of Hope: Mediterranean Migration Crisis</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-  <main>
-    <h1 style="color:white; text-align: center;">
-      Migrant Youth as part of the Mediterranean Migration Crisis
-    </h1>
-
-    <h3 style="color:white; text-align: center;">What is the relationship between educational attainment and employment
-      opportunities for migrant students who arrived in European Union countries through the Mediterranean routes within
-      the past x years?
-    </h3>
-
-    <p style="color:white;">This graph represents the migrant youth population in various European countries
-      from 2014 to 2022.
-    </p>
-    <p style="color:white;">The education (percentage with a tertiary degree) and employment rate (currently employed)
-      are represented by the position of the flags, while the total migrant population is represented by their sizes.
-    </p>
-
-    <br>
-    <select id="selectYear" style="margin-left: 45%; margin-bottom: 1%; padding: 10px; font-size: 20px;">
-    </select>
-  </main>
+    <header>
+        <h1>Harbours of Hope: Mediterranean Migration Crisis</h1>
+    </header>
+    <main>
+        <section class="intro-text">
+            <h2>Welcome to the Harbours of Hope Project</h2>
+            <p>Our project, undertaken by a group of students, seeks to deepen comprehension of the Mediterranean migration crisis by visualizing migrant youth-related data. Through interactive charts and graphs, we endeavor to illuminate their challenges and triumphs amid arduous journeys. This project is part of our coursework in Interactive Information Visualization, and our main goal is to contribute meaningfully to the understanding of migration dynamics.</p>
+        </section>
+        <section class="about-visualizations">
+            <h3>About the Visualizations</h3>
+            <p> Our visualizations provide a comparative analysis of educational achievements and employment statuses among young migrants across various EU countries. They illuminate disparities and commonalities, shedding light on the diverse outcomes resulting from migrant integration policies. Serving as a valuable resource, these visualizations cater to researchers, humanitarian organizations, policymakers, and socially conscious individuals, fostering informed decision-making and engagement. Understanding these patterns is pivotal in addressing the educational and employment challenges faced by migrant youth, driving the development of more effective support systems and inclusive policies. Users can navigate the visualizations by selecting specific years, with flags representing different EU countries and their placement indicating key education and employment statistics. Additionally, the size of each flag corresponds to the migrant youth population, providing a visual representation of the data's signifitrong>How:</strong> Navigate through the visualization by selecting a specific year. The flags represent different EU countries, with their placement indicating key statistics on education and employment. The size of each flag corresponds to the size of the migrant youth population, providing a visual weight to the data.</p>
+        </section>
+        </section>
+          <section class="view-button">
+            <button onclick="window.location.href='visualization.html';">View the Visualization</button>
+          </section>
+    </main>
+    <footer>
+        <p>© 2024 Harbours of Hope Project</p>
+    </footer>
 </body>
-
 </html>

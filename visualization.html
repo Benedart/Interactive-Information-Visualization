@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <title>Data Visualization of the Mediterranean Migration Crisis</title>
+  <script src="p5.min.js"></script>
+  <script src="sketch.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Harbours of Hope: Mediterranean Migration Crisis</h1>
+  </header>
+  <main class="visualization-main">
+    <h2>Employment Rate vs Educational Attainment (2014-2022)</h2>
+    <p style="margin-left: 20px;">This graph compares the employment rate (Y-axis) against the level of education (X-axis) of young immigrants aged between 18 and 25 years in European countries.</p>
+    <p style="margin-left: 20px;">The employment rate is the percentage of immigrants who are employed out of the total (all immigrants living in that country).</p>
+    <p style="margin-left: 20px;">The educational attainment is the percentage of immigrants between the ages of 18 and 25 who have continued with their higher education (university, vocational training...) out of the total (all immigrants aged between 18 and 25 living in that country).</p>
+    <p style="margin-left: 20px;">Education and employment rate are represented by the position of the flags, while the total migrant population of each country is represented by their sizes.</p>
+    <section>
+      <section class="content">
+        <select id="selectYear" class="selectButton"></select>
+      </section>
+    </section>      
+    <!-- Canvas will be inserted here by p5.js -->
+  </main>
+  <!-- Sección para mostrar la información del país seleccionado -->
+  <section class="countryInfo" id="countryInfo" style="display: none;">
+    <h3>Country Information</h3>
+    <p id="countryData"></p>
+  </section>
+  <!-- Botón de retroceso -->
+  <section class="backButton">
+    <button onclick="window.location.href='index.html';">Back to Main Page</button>
+  </section>
+  <footer>
+    <p>© 2024 Harbours of Hope Project</p>
+  </footer>
+</body>
+</html>
