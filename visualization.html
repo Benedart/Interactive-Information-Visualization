@@ -20,6 +20,7 @@
     <p style="margin-left: 20px;">The employment rate is the percentage of immigrants who are employed between the ages of 18 and 25.</p>
     <p style="margin-left: 20px;">The educational attainment is the percentage of immigrants between the ages of 18 and 25 who have continued with their higher education (university, vocational training...) out of the total (all immigrants aged between 18 and 25 living in that country).</p>
     <p style="margin-left: 20px;">Education and employment rate are represented by the position of the flags, while the total migrant population of each country is represented by their sizes.</p>
+    <p style="margin-left: 20px;">Click on the country of your choice to obtain detailed information.</p>
     <section>
       <section class="content">
         <select id="selectYear" class="selectButton"></select>
@@ -29,12 +30,13 @@
     <div id="sketch-holder"></div>
   </main>
   <!-- Sección para mostrar la información del país seleccionado -->
-  <section class="countryInfo" id="countryInfo" style="display: none;">
-    <h3>Country Information</h3>
-    <p id="countryData"></p>
+  <section class="country-info-section">
+    <div class="country-info-box">
+      <h2>Age Distribution</h2>
+      <p id="countryData">Select a country to see its data.</p>
+      <div id="age-distribution-holder" style="margin-left: 5%;"></div>
+    </div>
   </section>
-  <p>Work in progress</p>
-  <section id="age-distribution-holder" style="margin-left: 5%;"></section>
   <!-- Botón de retroceso -->
   <section class="backButton">
     <button onclick="window.location.href='index.html';">Back to Main Page</button>

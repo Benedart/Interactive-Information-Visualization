@@ -14,7 +14,7 @@ header {
 main {
     max-width: 1200px; /* O el ancho que prefieras */
     margin: auto; /* Centra el 'main' en la página */
-    background-color: #ffffff; /* Fondo blanco para el contenido */
+    background-color:white; /* Fondo blanco para el contenido */
     height: 700px;
     border-radius: 8px; /* Bordes redondeados para el 'main' */
     box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Sombra suave para dar profundidad */
@@ -70,28 +70,30 @@ footer {
 }
 
 .visualization-main{
-   height: 870px;
+   height: 900px;
 }
 
 .selectButton {
     display: flex; /* Ajusta el margen izquierdo según sea necesario */
     margin-left: 45%;
-    margin-top: -9%;
-}
-
-.countryInfo {
-    max-width: 1200px; /* O el ancho que prefieras */
-    margin: auto; /* Centra el 'countryInfo' en la página */
-    background-color: #ffffff; /* Fondo blanco para el contenido */
-    border-radius: 8px; /* Bordes redondeados para el 'countryInfo' */
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Sombra suave para dar profundidad */
-    overflow: hidden; /* Asegura que el borde redondeado contenga todo el contenido */
-    padding: 20px;
-    margin-top: 10px; /* Espacio entre 'main' y 'countryInfo' */
-    margin-bottom: 30px;
+    margin-top: -7%;
+    padding-bottom: 10px;
 }
 
 .countryInfo h3 {
     margin-top: 0; /* Elimina el margen superior del encabezado */
+}
+
+.country-info-section{
+    max-width: 1200px; /* O el ancho que prefieras */
+    margin: auto; /* Centra el 'main' en la página */
+    background-color: #ffffff; /* Fondo blanco para el contenido */
+    height: 700px;
+    border-radius: 8px; /* Bordes redondeados para el 'main' */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Sombra suave para dar profundidad */
+    overflow: hidden; /* Asegura que el borde redondeado contenga todo el contenido */
+    margin-top: 10px; /* Eleva el 'main' para solapar el header */
+    padding: 20px;
+    margin-bottom: 30px;
 }
 
