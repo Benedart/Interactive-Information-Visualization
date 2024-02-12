@@ -77,7 +77,7 @@ var countrySketch = function (p) {
     p.createYearSelector(years);
     // Load flag images
     for (let country of countries) {
-      flags[country] = p.loadImage(`data/flags/${country}.png`);
+      flags[country] = p.loadImage(`data/flags/circles/${country}.png`);
     }
     // set the text type and size
     p.textFont(font_type);
@@ -243,7 +243,7 @@ var countrySketch = function (p) {
       // Draw the perimeter of the flag
       p.noFill();
       p.stroke(0);
-      p.rect(x - flagSize / 2, y - flagSize / 2, flagSize, flagSize);
+      p.circle(x, y, flagSize, flagSize);
     }
     // Draw the hovered flag on top
     if (hoveredFlagIndex !== -1) {
@@ -258,7 +258,7 @@ var countrySketch = function (p) {
       // Draw the perimeter of the hovered flag
       p.noFill();
       p.stroke(255, 0, 0); // Highlight in red
-      p.rect(xHovered - flagSizeHovered / 2, yHovered - flagSizeHovered / 2, flagSizeHovered, flagSizeHovered);
+      p.circle(xHovered, yHovered, flagSizeHovered, flagSizeHovered);
     }
   }
 
