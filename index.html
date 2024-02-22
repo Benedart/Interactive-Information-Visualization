@@ -4,41 +4,217 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Harbours of Hope: Mediterranean Migration Crisis</title>
-  <link rel="stylesheet" href="style.css">
+  <title>D3 Chart</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      /* Disable horizontal scroll */
+    }
+
+    .headline {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background-color: #333;
+      color: #fff;
+      padding: 10px;
+      text-align: center;
+      font-size: 24px;
+      z-index: 1000;
+    }
+
+    .section {
+      width: 50%;
+      float: left;
+      padding: 20px;
+      height: 1000px;
+      /* Add some height to make scrolling noticeable */
+      margin-top: 60px;
+      /* Adjust for the headline height */
+    }
+
+    #chart {
+      width: 50%;
+      float: right;
+      position: fixed;
+      padding: 20px;
+      height: 100%;
+      /* Take full height of the viewport */
+      top: 0;
+      right: 0;
+      bottom: 0;
+      overflow: hidden;
+      margin-top: 60px;
+      /* Adjust for the headline height */
+    }
+
+    svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .info {
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .legend {
+      font-size: 12px;
+      display: none;
+      /* Initially hide the legend */
+    }
+  </style>
 </head>
 
 <body>
-  <header>
-    <h1>Harbours of Hope: Mediterranean Migration Crisis</h1>
-  </header>
-  <main>
-    <section class="intro-text">
-      <h2>Welcome to the Harbours of Hope Project</h2>
-      <p>The Mediterranean migration crisis plays a very big role in shaping the EU and it's policies.
-          There is a lot of data and visualisations focused on the the issue as a whole but often migrant youth are overlooked.
-          By visualizing migrant youth-related data, we hope to broaden our understanding of how young people are experiencing the crisis. 
-          Through the use of the interactive charts and graphs on this site, their challenges and current experiences can be considered in relation to the journeys they have undetaken. 
-          This project is part of our coursework in Interactive Information Visualization, and our main goal is to contribute meaningfully to the understanding of migration dynamics.</p>
-  </section>
-  <section class="about-visualizations">
-      <h3>About the Visualizations</h3>
-      <p> Our visualizations provide a comparative analysis of educational achievements and employment statuses among young migrants across various EU countries. 
-          They explore the disparities and commonalities of youth, shedding light on the various outcomes resulting from current migrant integration policies. 
-          These visualizations serve as a resource: for students wishing to better understand the situation but can also cater to researchers, humanitarian organizations, policymakers, and socially conscious individuals, fostering informed decision-making and engagement. 
-          Students are central to social movments within EU countries. The future of Europe is important to them. They care about social justice and human rights but often don't have access to meaningful visualisations. That is why this kind of platform matters to them.
-          Understanding these patterns is pivotal in addressing the educational and employment challenges faced by migrant youth, allowing for people to demand the development of more effective support systems and inclusive policies. 
-          Currently, users can navigate the visualizations by selecting specific years, with flags representing different EU countries and their placement indicating key education and employment statistics. 
-          Additionally, the size of each flag corresponds to the migrant youth population, providing a visual representation of the differences between migrants and their experiences in each of the EU countries.</p>
-    </section>
-    </section>
-    <section class="view-button">
-      <button onclick="window.location.href='visualization.html';">View the Visualization</button>
-    </section>
-  </main>
-  <footer>
-    <p>© 2024 Harbours of Hope Project</p>
-  </footer>
+  <div class="headline">
+    How Educational Attainment affects Employment rate and Earnings
+  </div>
+
+  <div id="intro" class="section">
+    <h2>Introduction</h2>
+    <p>This is the introductory text explaining the chart.</p>
+    <p>Scroll down to see the chart update as you scroll.</p>
+    <!-- Add more content here -->
+  </div>
+
+  <div id="highlightedSection" class="section">
+    <h2>Highlighted Section</h2>
+    <p>This section will highlight a portion of the "population" on the chart.</p>
+    <!-- Add more content here -->
+  </div>
+
+  <div id="chart">
+    <!-- D3 chart will be rendered here -->
+  </div>
+
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const totalPopulation = 88000000; // Total population
+      let scrolled = false;
+
+      const introText = "Total Population: " + totalPopulation.toLocaleString() + " young people";
+      d3.select("#intro").append("p").text(introText);
+
+      const svg = d3.select("#chart")
+        .append("svg")
+        .attr("width", "100%")
+        .attr("height", "100%");
+
+      const width = document.getElementById("chart").offsetWidth;
+      const height = document.getElementById("chart").offsetHeight;
+
+      const margin = { top: 50, right: 50, bottom: 50, left: 50 };
+      const innerWidth = width - margin.left - margin.right;
+      const innerHeight = height - margin.top - margin.bottom;
+
+      const updateChart = () => {
+        if (!scrolled) return;
+        const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+        const chartOffsetTop = document.getElementById("chart").offsetTop;
+        const sectionOffsetTop = document.getElementById("highlightedSection").offsetTop;
+        const sectionHeight = document.getElementById("highlightedSection").offsetHeight;
+
+        // Calculate the scroll progress based on reaching the second section
+        const scrollProgress = Math.max(0, Math.min(1, (scrollTop - sectionOffsetTop + window.innerHeight) / sectionHeight));
+
+        // Update the chart based on the scroll progress
+        // Example: Change circle color based on scroll progress
+        svg.selectAll("circle")
+          .transition()
+          .duration(500)
+          .style("fill", (d, i) => {
+            if (scrollProgress >= 0.54) {
+              return i / (totalPopulation / 100000) <= 0.54 ? "orange" : "grey";
+            } else {
+              return "grey";
+            }
+          });
+
+        // Show legend if scroll progress exceeds a threshold
+        if (scrollProgress >= 0.5) {
+          d3.select(".legend").style("display", "block");
+        } else {
+          d3.select(".legend").style("display", "none");
+        }
+      };
+
+      const groups = Math.ceil(totalPopulation / 100000); // Divide the population into groups
+
+      const radius = 7; // Adjust the size of the circles
+      const marginBetweenCircles = 1.5; // Adjust the margin between circles
+
+      const circleData = Array.from({ length: groups }, (_, i) => i); // Generate an array of group indices
+
+      svg.selectAll("circle")
+        .data(circleData)
+        .enter()
+        .append("circle")
+        .attr("cx", (d, i) => {
+          const col = i % Math.floor(Math.sqrt(groups));
+          return margin.left + (2 * col + 1) * (radius + marginBetweenCircles);
+        })
+        .attr("cy", (d, i) => {
+          const row = Math.floor(i / Math.floor(Math.sqrt(groups)));
+          return margin.top + (2 * row + 1) * (radius + marginBetweenCircles);
+        })
+        .attr("r", radius)
+        .style("fill", "grey");
+
+      svg.append("text")
+        .attr("x", 80)
+        .attr("y", 30)
+        .attr("class", "info")
+        .text("Each circle represents approximately 100'000 young people (age 18-24)");
+
+      // Add text at the bottom
+      svg.append("text")
+        .attr("x", width / 2)
+        .attr("y", height - 5)
+        .attr("text-anchor", "middle")
+        .attr("class", "info")
+        .text("Chart Explanation");
+
+      // Add legend for the second visualization
+      const legend = svg.append("g")
+        // should be below the graph
+        .attr("transform", "translate(" + (200) + "," + (height - 270) + ")")
+        .attr("class", "legend")
+
+
+      legend.append("rect")
+        .attr("x", -10)
+        .attr("y", -20)
+        .attr("width", 225)
+        .attr("height", 55)
+        .attr("fill", "white")
+        .attr("stroke", "black");
+
+      legend.append("text")
+        .attr("x", 0)
+        .attr("y", 0)
+        .text("Orange: Young people in Education")
+        .attr("fill", "orange")
+
+      legend.append("text")
+        .attr("x", 0)
+        .attr("y", 20)
+        .text("Grey: Young people NOT in Education")
+        .attr("fill", "grey");
+
+      // Listen for scroll events
+      window.addEventListener("scroll", function () {
+        scrolled = true;
+        updateChart();
+      });
+
+    });
+  </script>
+
 </body>
 
 </html>
