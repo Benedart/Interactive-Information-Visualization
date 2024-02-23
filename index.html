@@ -32,7 +32,7 @@
       padding: 20px;
       height: 1000px;
       /* Add some height to make scrolling noticeable */
-      margin-top: 60px;
+      margin-top: 90px;
       /* Adjust for the headline height */
     }
 
@@ -66,6 +66,24 @@
       display: none;
       /* Initially hide the legend */
     }
+
+    .country-select {
+      position: fixed;
+      top: 80px;
+      /* Adjust according to your design */
+      left: 10px;
+      /* Adjust according to your design */
+      z-index: 1000;
+    }
+
+    .select-prompt {
+      position: fixed;
+      top: 40px;
+      /* Adjust according to your design */
+      left: 10px;
+      /* Adjust according to your design */
+      z-index: 1000;
+    }
   </style>
 </head>
 
@@ -73,6 +91,12 @@
   <div class="headline">
     How Educational Attainment affects Employment rate and Earnings
   </div>
+
+  <!-- add a prompt -->
+  <p class="select-prompt">Choose a country to see the chart update:</p>
+  <select class="country-select" id="countrySelect">
+    <!-- Options will be dynamically added here -->
+  </select>
 
   <div id="intro" class="section">
     <h2>Introduction</h2>
@@ -94,124 +118,225 @@
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-      const totalPopulation = 88000000; // Total population
-      let scrolled = false;
+      // const totalPopulation = 88112381; // Total population, from OECD data: https://data-explorer.oecd.org/vis?tm=youth&pg=0&snb=7&vw=tb&df[ds]=dsDisseminateFinalDMZ&df[id]=DSD_POPULATION%40DF_POP_HIST&df[ag]=OECD.ELS.SAE&df[vs]=1.0&pd=2022%2C2022&dq=OECD..PS._T.Y20T24.&to[TIME_PERIOD]=false
+      var selectedCountry = "OECD";
 
-      const introText = "Total Population: " + totalPopulation.toLocaleString() + " young people";
-      d3.select("#intro").append("p").text(introText);
+      // import dataset for stats about education vs non-education, the separator is a semicolon
+      d3.csv("data/merged.csv").then(function (data) {
+        console.log(data);
 
-      const svg = d3.select("#chart")
-        .append("svg")
-        .attr("width", "100%")
-        .attr("height", "100%");
+        const updateChart = (selectedCountry) => {
+          // delete the previous circles
+          // Delete the previous circles with a transition
+          svg.selectAll("circle")
+            .remove();
 
-      const width = document.getElementById("chart").offsetWidth;
-      const height = document.getElementById("chart").offsetHeight;
+          // display the circles based on the totalpopulation and groupsize
+          groups = Math.ceil(totalPopulation / groupSize);
+          circleData = Array.from({ length: groups }, (_, i) => i);
 
-      const margin = { top: 50, right: 50, bottom: 50, left: 50 };
-      const innerWidth = width - margin.left - margin.right;
-      const innerHeight = height - margin.top - margin.bottom;
+          svg.selectAll("circle")
+            .data(circleData)
+            .enter()
+            .append("circle")
+            .attr("cx", (d, i) => {
+              const col = i % Math.floor(Math.sqrt(groups));
+              return margin.left + (2 * col + 1) * (radius + marginBetweenCircles);
+            })
+            .attr("cy", (d, i) => {
+              const row = Math.floor(i / Math.floor(Math.sqrt(groups)));
+              return margin.top + (2 * row + 1) * (radius + marginBetweenCircles);
+            })
+            .attr("r", 0) // Start with zero radius for smooth transition
+            .style("fill", "grey")
+            .transition()
+            .duration(100)
+            .delay((d, i) => i) // Delay each circle for a staggered effect
+            .attr("r", radius); // Transition to the final radius
 
-      const updateChart = () => {
-        if (!scrolled) return;
-        const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-        const chartOffsetTop = document.getElementById("chart").offsetTop;
-        const sectionOffsetTop = document.getElementById("highlightedSection").offsetTop;
-        const sectionHeight = document.getElementById("highlightedSection").offsetHeight;
 
-        // Calculate the scroll progress based on reaching the second section
-        const scrollProgress = Math.max(0, Math.min(1, (scrollTop - sectionOffsetTop + window.innerHeight) / sectionHeight));
+          // if scrolled, we should color the circles
+          if (scrolled) {
+            educationPercentage = data.filter(d => d.Country === selectedCountry)[0].Education / 100;
 
-        // Update the chart based on the scroll progress
-        // Example: Change circle color based on scroll progress
-        svg.selectAll("circle")
-          .transition()
-          .duration(500)
-          .style("fill", (d, i) => {
-            if (scrollProgress >= 0.54) {
-              return i / (totalPopulation / 100000) <= 0.54 ? "orange" : "grey";
-            } else {
-              return "grey";
+            svg.selectAll("circle")
+              .style("fill", (d, i) => {
+                return i / (totalPopulation / groupSize) <= educationPercentage ? "orange" : "grey";
+              });
+          }
+        };
+
+        function handleScroll() {
+          if (!scrolled) return;
+          const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+          const chartOffsetTop = document.getElementById("chart").offsetTop;
+          const sectionOffsetTop = document.getElementById("highlightedSection").offsetTop;
+          const sectionHeight = document.getElementById("highlightedSection").offsetHeight;
+
+          // Calculate the scroll progress based on reaching the second section
+          const scrollProgress = Math.max(0, Math.min(1, (scrollTop - sectionOffsetTop + window.innerHeight) / sectionHeight));
+
+          if (scrollProgress >= 0.5) {
+            scrolled = true
+          } else {
+            scrolled = false
+          }
+
+          console.log(totalPopulation)
+
+          educationPercentage = data.filter(d => d.Country === selectedCountry)[0].Education / 100;
+          console.log("Education Percentage for " + selectedCountry + ":", educationPercentage);
+
+          // Update the chart based on the scroll progress
+          // Example: Change circle color based on scroll progress
+          svg.selectAll("circle")
+            .transition()
+            .duration(500)
+            .style("fill", (d, i) => {
+              if (scrollProgress >= 0.54) {
+                return i / (totalPopulation / groupSize) <= educationPercentage ? "orange" : "grey";
+              } else {
+                return "grey";
+              }
+            });
+
+          // Show legend if scroll progress exceeds a threshold
+          if (scrollProgress >= 0.5) {
+            d3.select(".legend").style("display", "block");
+          } else {
+            d3.select(".legend").style("display", "none");
+          }
+        }
+
+        let scrolled = false;
+
+        // Parse unique country names
+        const countryNames = [...new Set(data.map(d => d.Country))];
+
+        // Populate select element with options for each country
+        const countrySelect = document.getElementById('countrySelect');
+        countryNames.forEach(country => {
+          const option = document.createElement('option');
+          option.text = country;
+          countrySelect.add(option);
+        });
+
+        countrySelect.value = "OECD"; // Set default selected country
+
+        // Function to update chart based on selected country
+        function getPopulation(selectedCountry) {
+          const totalPopulation = parseFloat(data.filter(d => d.Country === selectedCountry)[0].Amount);
+
+          // Your chart update logic using the new totalPopulation
+          console.log("Total Population for " + selectedCountry + ":", totalPopulation);
+
+          return totalPopulation;
+        }
+
+        // Initial chart update based on the default selected country
+        const initialSelectedCountry = countrySelect.value;
+        var totalPopulation = getPopulation(initialSelectedCountry);
+
+        const groupSize = 100000; // Each circle represents 100'000 young people
+
+        const introText = "Total Population: " + totalPopulation.toLocaleString() + " young people";
+        d3.select("#intro").append("p").text(introText);
+
+        const svg = d3.select("#chart")
+          .append("svg")
+          .attr("width", "100%")
+          .attr("height", "100%");
+
+        const width = document.getElementById("chart").offsetWidth;
+        const height = document.getElementById("chart").offsetHeight;
+
+        const margin = { top: 50, right: 50, bottom: 50, left: 50 };
+        const innerWidth = width - margin.left - margin.right;
+        const innerHeight = height - margin.top - margin.bottom;
+
+        var groups = Math.ceil(totalPopulation / groupSize); // Divide the population into groups
+
+        const radius = 7; // Adjust the size of the circles
+        const marginBetweenCircles = 1.5; // Adjust the margin between circles
+
+        var circleData = Array.from({ length: groups }, (_, i) => i); // Generate an array of group indices
+
+        updateChart("OECD");
+
+        svg.append("text")
+          .attr("x", 80)
+          .attr("y", 30)
+          .attr("class", "info")
+          .text("Each circle represents approximately " + groupSize + " young people (age 18-24)");
+
+        // Add text at the bottom
+        svg.append("text")
+          .attr("x", width / 2)
+          .attr("y", height - 5)
+          .attr("text-anchor", "middle")
+          .attr("class", "info")
+          .text("Chart Explanation");
+
+        // Add legend for the second visualization
+        const legend = svg.append("g")
+          // should be below the graph
+          .attr("transform", "translate(" + (200) + "," + (height - 270) + ")")
+          .attr("class", "legend")
+
+        legend.append("rect")
+          .attr("x", -10)
+          .attr("y", -20)
+          .attr("width", 225)
+          .attr("height", 55)
+          .attr("fill", "white")
+          .attr("stroke", "black");
+
+        legend.append("text")
+          .attr("x", 0)
+          .attr("y", 0)
+          .text("Orange: Young people in Education")
+          .attr("fill", "orange")
+
+        legend.append("text")
+          .attr("x", 0)
+          .attr("y", 20)
+          .text("Grey: Young people NOT in Education")
+          .attr("fill", "grey");
+
+
+        // Flag to track if animation is in progress
+        let animationInProgress = false;
+
+        // Event listener to update chart when select option changes
+        countrySelect.addEventListener('change', function () {
+          let country = countrySelect.value;
+          selectedCountry = country;
+          totalPopulation = getPopulation(selectedCountry);
+          groups = Math.ceil(totalPopulation / groupSize);
+
+          // Disable scroll event listener during animation
+          animationInProgress = true;
+
+          // Update chart
+          updateChart(selectedCountry);
+
+          // Re-enable scroll event listener after animation completes
+          setTimeout(() => {
+            animationInProgress = false;
+          }, 1000); // Adjust timeout as needed based on animation duration
+        });
+
+        // wait 1 second before enabling the scroll event listener
+        setTimeout(() => {
+          window.addEventListener('scroll', function () {
+            console.log("Scrolled ", scrolled);
+            if (!animationInProgress) {
+              scrolled = true;
+              handleScroll();
             }
           });
-
-        // Show legend if scroll progress exceeds a threshold
-        if (scrollProgress >= 0.5) {
-          d3.select(".legend").style("display", "block");
-        } else {
-          d3.select(".legend").style("display", "none");
-        }
-      };
-
-      const groups = Math.ceil(totalPopulation / 100000); // Divide the population into groups
-
-      const radius = 7; // Adjust the size of the circles
-      const marginBetweenCircles = 1.5; // Adjust the margin between circles
-
-      const circleData = Array.from({ length: groups }, (_, i) => i); // Generate an array of group indices
-
-      svg.selectAll("circle")
-        .data(circleData)
-        .enter()
-        .append("circle")
-        .attr("cx", (d, i) => {
-          const col = i % Math.floor(Math.sqrt(groups));
-          return margin.left + (2 * col + 1) * (radius + marginBetweenCircles);
-        })
-        .attr("cy", (d, i) => {
-          const row = Math.floor(i / Math.floor(Math.sqrt(groups)));
-          return margin.top + (2 * row + 1) * (radius + marginBetweenCircles);
-        })
-        .attr("r", radius)
-        .style("fill", "grey");
-
-      svg.append("text")
-        .attr("x", 80)
-        .attr("y", 30)
-        .attr("class", "info")
-        .text("Each circle represents approximately 100'000 young people (age 18-24)");
-
-      // Add text at the bottom
-      svg.append("text")
-        .attr("x", width / 2)
-        .attr("y", height - 5)
-        .attr("text-anchor", "middle")
-        .attr("class", "info")
-        .text("Chart Explanation");
-
-      // Add legend for the second visualization
-      const legend = svg.append("g")
-        // should be below the graph
-        .attr("transform", "translate(" + (200) + "," + (height - 270) + ")")
-        .attr("class", "legend")
-
-
-      legend.append("rect")
-        .attr("x", -10)
-        .attr("y", -20)
-        .attr("width", 225)
-        .attr("height", 55)
-        .attr("fill", "white")
-        .attr("stroke", "black");
-
-      legend.append("text")
-        .attr("x", 0)
-        .attr("y", 0)
-        .text("Orange: Young people in Education")
-        .attr("fill", "orange")
-
-      legend.append("text")
-        .attr("x", 0)
-        .attr("y", 20)
-        .text("Grey: Young people NOT in Education")
-        .attr("fill", "grey");
-
-      // Listen for scroll events
-      window.addEventListener("scroll", function () {
-        scrolled = true;
-        updateChart();
+        }, 1000);
       });
-
     });
   </script>
 
