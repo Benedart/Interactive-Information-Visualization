@@ -1,4 +1,4 @@
-Country,Education_student_work,Education_employed_other,Education_employed,Education_unemployed,Education_inactive,Education,NE_employed,NE_unemployed,NE_inactive,NE_neet,NE,Total,Amount,Below upper secondary education,Upper secondary or post-secondary non-tertiary education,Tertiary education,Short-cycle tertiary education,Bachelor or equivalent education,Master or equivalent education,Doctoral or equivalent education
+Country,Education_student_work,Education_employed_other,Education_employed,Education_unemployed,Education_inactive,Education,NE_employed,NE_unemployed,NE_inactive,NE_neet,NE,Total,Amount,Below_upper_secondary,Upper_secondary,Tertiary,Shortcycle_tertiary,Bachelor,Master,Doctoral
 Australia,5.0,30.0,36.0,2.0,10.0,48.0,41.0,4.0,7.0,11.0,52.0,100.0,1631532.0,62.0,80.3,86.4,85.0,86.3,87.4,91.7
 Austria,8.0,14.0,22.0,1.0,26.0,49.0,40.0,4.0,6.0,10.0,51.0,100.0,498119.0,55.4,77.9,87.1,86.0,82.5,89.6,92.9
 Belgium,1.0,8.0,10.0,1.0,58.0,68.0,22.0,4.0,6.0,10.0,32.0,100.0,675071.0,47.0,73.7,87.7,85.2,85.8,90.0,91.3
