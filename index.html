@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>D3 Chart</title>
+  <title>The Impact of Education</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -84,7 +84,25 @@
       /* Adjust according to your design */
       z-index: 1000;
     }
+
+    /* p5.js visualization */
+    #p5-visualization {
+      position: fixed;
+      top: 100px;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      margin: auto;
+      width: 50%;
+      height: 100%;
+      margin-left: 40%;
+      margin-top: 2%;
+      display: none;
+      /* initially hide the p5.js visualization */
+    }
   </style>
+  <script src="p5.min.js"></script>
+  <script src="sketch.js"></script>
 </head>
 
 <body>
@@ -93,10 +111,12 @@
   </div>
 
   <!-- add a prompt -->
-  <p class="select-prompt">Choose a country to see the chart update:</p>
-  <select class="country-select" id="countrySelect">
-    <!-- Options will be dynamically added here -->
-  </select>
+  <div id="countrySelectDiv">
+    <p class="select-prompt">Choose a country to see the chart update:</p>
+    <select class="country-select" id="countrySelect">
+      <!-- Options will be dynamically added here -->
+    </select>
+  </div>
 
   <div id="intro" class="section">
     <h2>Introduction</h2>
@@ -111,20 +131,60 @@
     <!-- Add more content here -->
   </div>
 
-  <div id="focusSection" class="section">
-    <h2>Focus Section</h2>
-    <p>This section will focus on a specific portion of the "population" on the chart.</p>
+  <div id="employment" class="section">
+    <h2>Education vs Employment</h2>
+    <p>This section will highlight the relationship between education and employment.</p>
+    <!-- Add more content here -->
+
+    <!-- add a button to switch the chart -->
+    <button id="switchChart">Switch Chart</button>
+  </div>
+
+  <div id="earnings" class="section">
+    <h2>Earnings</h2>
+    <p>This section will highlight the relationship between education and earnings.</p>
     <!-- Add more content here -->
   </div>
 
-  <div id="chart">
-    <!-- D3 chart will be rendered here -->
+  <div id="conclusion" class="section">
+    <h2>Conclusion</h2>
+    <p>This is the conclusion of the chart.</p>
+    <!-- Add more content here -->
   </div>
+
+  <div id="p5-visualization" class="section">
+    <!-- p5.js visualization goes here -->
+    <section>
+      <section class="content">
+        <input type="range" id="yearRange" min="2015" max="2022" value="2022">
+        <!-- add yearLabel in the same row as the range input -->
+        <label for="yearRange" id="yearLabel">2022</label>
+      </section>
+    </section>
+  </div>
+
+  <div id="visualization-container">
+    <div id="d3-visualization">
+      <!-- D3 visualization goes here -->
+      <div id="chart">
+        <!-- D3 chart will be rendered here -->
+        <p id="title" style="text-align: center;">Young People in OECD</p>
+        <p id="intro" style="text-align: center;">Each circle represents approximately 100,000 young people (age
+          18-24)
+        </p>
+      </div>
+    </div>
+
+  </div>
+
 
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-      // const totalPopulation = 88112381; // Total population, from OECD data: https://data-explorer.oecd.org/vis?tm=youth&pg=0&snb=7&vw=tb&df[ds]=dsDisseminateFinalDMZ&df[id]=DSD_POPULATION%40DF_POP_HIST&df[ag]=OECD.ELS.SAE&df[vs]=1.0&pd=2022%2C2022&dq=OECD..PS._T.Y20T24.&to[TIME_PERIOD]=false
+      const switchButton = document.getElementById("switchChart");
+      const d3Visualization = document.getElementById("d3-visualization");
+      const p5Visualization = document.getElementById("p5-visualization");
+
       var selectedCountry = "OECD";
 
       // import dataset for stats about education vs non-education, the separator is a semicolon
@@ -136,6 +196,9 @@
           // Delete the previous circles with a transition
           svg.selectAll("circle")
             .remove();
+
+          // update the chart title
+          d3.select("#title").text("Young People in " + selectedCountry);
 
           // display the circles based on the totalpopulation and groupsize
           groups = Math.ceil(totalPopulation / groupSize);
@@ -179,12 +242,33 @@
           const sectionOffsetTop = document.getElementById("highlightedSection").offsetTop;
           const sectionHeight = document.getElementById("highlightedSection").offsetHeight;
 
+          const sectionEmploymentOffsetTop = document.getElementById("employment").offsetTop;
+          const sectionEmploymentHeight = document.getElementById("employment").offsetHeight;
+
+          const sectionEarningsOffsetTop = document.getElementById("earnings").offsetTop;
+          const sectionEarningsHeight = document.getElementById("earnings").offsetHeight;
+
+          const sectionConclusionOffsetTop = document.getElementById("conclusion").offsetTop;
+          const sectionConclusionHeight = document.getElementById("conclusion").offsetHeight;
+
           // Calculate the scroll progress based on reaching the second section
           const scrollProgress = Math.max(0, Math.min(1, (scrollTop - sectionOffsetTop + window.innerHeight) / sectionHeight));
 
-          console.log("Scroll Progress: ", scrollProgress);
+          // Calculate the scroll progress based on reaching the third section
+          const scrollProgressEmployment = Math.max(0, Math.min(1, (scrollTop - sectionEmploymentOffsetTop + window.innerHeight) / sectionEmploymentHeight));
 
-          if (scrollProgress >= 0.5) {
+          // Calculate the scroll progress based on reaching the fourth section
+          const scrollProgressEarnings = Math.max(0, Math.min(1, (scrollTop - sectionEarningsOffsetTop + window.innerHeight) / sectionEarningsHeight));
+
+          // Calculate the scroll progress based on reaching the fifth section
+          const scrollProgressConclusion = Math.max(0, Math.min(1, (scrollTop - sectionConclusionOffsetTop + window.innerHeight) / sectionConclusionHeight));
+
+          console.log("Scroll Progress: ", scrollProgress);
+          console.log("Scroll Progress Employment: ", scrollProgressEmployment);
+          console.log("Scroll Progress Earnings: ", scrollProgressEarnings);
+          console.log("Scroll Progress Conclusion: ", scrollProgressConclusion);
+
+          if (scrollProgress >= 0.6) {
             scrolled = true
           } else {
             scrolled = false
@@ -201,7 +285,7 @@
             .transition()
             .duration(500)
             .style("fill", (d, i) => {
-              if (scrollProgress >= 0.54) {
+              if (scrollProgress >= 0.6) {
                 return i / (totalPopulation / groupSize) <= educationPercentage ? "orange" : "grey";
               } else {
                 return "grey";
@@ -209,10 +293,40 @@
             });
 
           // Show legend if scroll progress exceeds a threshold
-          if (scrollProgress >= 0.5) {
+          if (scrollProgress >= 0.6 && scrollProgress < 1) {
             d3.select(".legend").style("display", "block");
           } else {
             d3.select(".legend").style("display", "none");
+          }
+
+          // if not in the last section, hide the p5.js visualization
+          if (scrollProgressConclusion < 0.6) {
+            d3Visualization.style.display = "block";
+            p5Visualization.style.display = "none";
+
+            // show the select of the country
+            document.getElementById("countrySelectDiv").style.display = "block";
+          }
+
+          // change the title of the chart based on the scroll progress
+          if (scrollProgress < 0.6) {
+            d3.select("#title").text("Young People in " + selectedCountry);
+          }
+          else if (scrollProgress >= 0.6 && scrollProgress < 1) {
+            d3.select("#title").text("Young People in " + selectedCountry + " (Education vs Non-Education)");
+          } else if (scrollProgressEmployment >= 0.6 && scrollProgressEmployment < 1) {
+            d3.select("#title").text("Education vs Employment");
+          } else if (scrollProgressEarnings >= 0.6 && scrollProgressEarnings < 1) {
+            d3.select("#title").text("Education vs Earnings");
+          } else if (scrollProgressConclusion >= 0.6 && scrollProgressConclusion < 1) {
+            d3.select("#title").text("Young People in " + selectedCountry);
+
+            // show p5.js visualization
+            d3Visualization.style.display = "none";
+            p5Visualization.style.display = "block";
+
+            // hide the select of the country
+            document.getElementById("countrySelectDiv").style.display = "none";
           }
         }
 
@@ -270,12 +384,6 @@
         var circleData = Array.from({ length: groups }, (_, i) => i); // Generate an array of group indices
 
         updateChart("OECD");
-
-        svg.append("text")
-          .attr("x", 80)
-          .attr("y", 30)
-          .attr("class", "info")
-          .text("Each circle represents approximately " + groupSize + " young people (age 18-24)");
 
         // Add text at the bottom
         svg.append("text")

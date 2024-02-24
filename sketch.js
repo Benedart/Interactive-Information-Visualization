@@ -1,6 +1,6 @@
 var countrySketch = function (p) {
   // set our canvas size, unit is pixel
-  var canvas_width = 1350;
+  var canvas_width = 900;
   var canvas_height = 600;
 
   var font_type = 'Arial';
@@ -29,9 +29,9 @@ var countrySketch = function (p) {
   /* preload the data */
   p.preload = function () {
     /* read csv file */
-    attainment_table = p.loadTable("data/Procesed Eurostat Dataset.csv", "csv", "header");
-    employment_table = p.loadTable("data/Employment-Processed-Temp.csv", "csv", "header");
-    population_table = p.loadTable("data/Population-Migrant-AllAge-FinalwithNum.csv", "csv", "header");
+    attainment_table = p.loadTable("data/p5/Processed Eurostat Dataset.csv", "csv", "header");
+    employment_table = p.loadTable("data/p5/Employment-Processed-Temp.csv", "csv", "header");
+    population_table = p.loadTable("data/p5/Population-Migrant-AllAge-FinalwithNum.csv", "csv", "header");
   }
 
   p.windowResized = function () {
@@ -73,8 +73,8 @@ var countrySketch = function (p) {
     console.log("Educational Attainment: ", educational_attainment);
     console.log("Employment Rate: ", employment_rate);
     console.log("Population: ", population);
-    // create the year selector
-    p.createYearSelector(years);
+    // Create the year range input
+    p.createYearRangeInput();
     // Load flag images
     for (let country of countries) {
       flags[country] = p.loadImage(`data/flags/circles/${country}.png`);
@@ -82,7 +82,6 @@ var countrySketch = function (p) {
     // set the text type and size
     p.textFont(font_type);
     p.textSize(font_height);
-    p.select('#selectYear').style('width', '100px').position(10, canvas_height - 30);
   }
 
   p.draw = function () {
@@ -123,19 +122,9 @@ var countrySketch = function (p) {
       let flagSize = p.map(population[selectedYear][i], 0, p.max(population[selectedYear]), 20, 80);
       let d = p.dist(p.mouseX, p.mouseY, x, y);
       if (d < flagSize / 2) {
-        // Si se hace clic dentro del área de un país, muestra la información del país
-        let country = countries[i];
-        let attainment = educational_attainment[selectedYear][i];
-        let employment = employment_rate[selectedYear][i];
-        document.getElementById("countryInfo").innerHTML = `${country}<br>Educational Attainment: ${attainment}%<br>Employment Rate: ${employment}%`;
-        document.getElementById("countryInfo").style.display = "block";
         flagClicked = true; // Indicar que se hizo clic en un país
         break; // Deja de buscar una vez que encuentres un país bajo el cursor
       }
-    }
-    if (!flagClicked) {
-      // Si no se hizo clic en ningún país, ocultar la información del país
-      document.getElementById("countryInfo").style.display = "none";
     }
   }
 
@@ -262,143 +251,18 @@ var countrySketch = function (p) {
     }
   }
 
-  p.createYearSelector = function (years) {
-    // fill the html element with id "year" with the selected year
-    let yearSelector = document.getElementById("selectYear");
-    // fill with options 
-    yearSelector.innerHTML = "";
-    for (let i = 1; i < years.length; i++) {
-      let option = document.createElement("option");
-      option.text = years[i];
-      yearSelector.add(option);
-    }
-    yearSelector.onchange = p.updateYear;
-    // set the default value
-    yearSelector.value = selectedYear;
+  p.createYearRangeInput = function () {
+    let yearRangeInput = document.getElementById("yearRange");
+    yearRangeInput.addEventListener("input", p.updateYearRange);
   }
 
-  p.updateYear = function () {
-    selectedYear = this.value;
-    console.log(selectedYear);
+  p.updateYearRange = function () {
+    // assign the selected value to the selectedYear variable
+    selectedYear = document.getElementById("yearRange").value;
+    // update the year label
+    document.getElementById("yearLabel").innerHTML = selectedYear;
+    console.log("Selected year: ", selectedYear);
   }
 }
 
-
-
-
-var ageDistributionSketch = function (p) {
-  p.preload = () => {
-    data = p.loadTable("data/ageDistribution.csv", "csv", "header");
-  };
-
-  p.setup = () => {
-    p.createCanvas(1200, 600);
-
-    yearDropdown = p.createSelect();
-    countryDropdown = p.createSelect();
-
-    // Add years to dropdown
-    years = data.getColumn('Year');
-    yearDropdown.option('Select year');
-    years.forEach(year => yearDropdown.option(year));
-
-    // Add countries to dropdown
-    countryList = data.getColumn('Country');
-    countryDropdown.option('Select country');
-    countryList.forEach(country => countryDropdown.option(country));
-
-    yearDropdown.changed(updateGraph);
-    countryDropdown.changed(updateGraph);
-  };
-
-  p.draw = function () {
-    // Clear the canvas
-    p.background(220);
-
-    // Set up the axes and labels
-    p.textAlign(p.RIGHT, p.CENTER);
-    p.fill(0);
-    p.textSize(12);
-    p.strokeWeight(1);
-    p.line(50, 50, 50, p.height - 50); // Y-axis line
-    p.line(50, p.height - 50, p.width - 50, p.height - 50); // X-axis line
-    p.text("Quantity of migrants", 210, p.height - 40); // X-axis label
-
-    // Rotate the Y-axis label
-    p.push();
-    p.translate(20, p.height / 2);
-    p.rotate(-p.HALF_PI);
-    p.text("Age Groups", 50, 10); // Y-axis label
-    p.pop();
-
-    // Get the selected year and country
-    const selectedYear = yearDropdown.value();
-    const selectedCountry = countryDropdown.value();
-
-    // TODO: Filter data based on the selected options
-    const filteredRows = data.rows.filter(row => row.get('Year') === "2020" && row.get('Country') === "WORLD");
-
-    // Check if there are any filtered rows
-    if (filteredRows.length > 0) {
-      // Assuming 'ageGroups' is an array of age group labels
-      const ageGroups = data.columns.slice(6);
-
-      // remove the last column, which is the total
-      ageGroups.splice(-1, 1);
-
-      // Find the maximum value between all age groups
-      let maxValue = 0;
-      for (let i = 0; i < ageGroups.length; i++) {
-        let value = filteredRows[0].get(ageGroups[i]); // Assuming all rows have the same value for this age group
-        if (value > maxValue) {
-          maxValue = value;
-        }
-      }
-
-      // Calculate the height of each bar and the space between them
-      const barHeight = (p.height - 100) / ageGroups.length - 10;
-      const barSpacing = 10;
-
-      // Draw the bars
-      p.noStroke();
-      for (let i = 0; i < ageGroups.length; i++) {
-        let value = filteredRows[0].get(ageGroups[i]);
-        let x = 100;
-        let y = 50 + i * (barHeight + barSpacing);
-        let barWidth = p.map(value, 0, maxValue, 0, p.width - 1000);
-        p.fill(0);
-        p.rect(x, y, barWidth, barHeight);
-        p.fill(0);
-        p.text(ageGroups[i], x - 10, y + barHeight / 2);
-      }
-
-      // Draw the title
-      p.textAlign(p.CENTER, p.CENTER);
-      p.textSize(18);
-      p.text("Age Distribution", p.width / 2, 20);
-
-      // if you hover over the bar, it will show the value
-      p.textSize(12);
-      for (let i = 0; i < ageGroups.length; i++) {
-        let value = filteredRows[0].get(ageGroups[i]);
-        let x = 100;
-        let y = 50 + i * (barHeight + barSpacing);
-        let barWidth = p.map(value, 0, maxValue, 0, p.width - 1000);
-        if (p.mouseX > x && p.mouseX < x + barWidth && p.mouseY > y && p.mouseY < y + barHeight) {
-          p.fill(0);
-          p.text(value, x + barWidth + 40, y + barHeight / 2);
-        }
-      }
-    } else {
-      p.text("No data available for the selected year and country.", 50, p.height / 2);
-    }
-  }
-
-  function updateGraph() {
-    console.log('Updating graph...');
-    p.redraw();
-  }
-};
-
-var myp5 = new p5(countrySketch, 'sketch-holder');
-var ageDistributionP5 = new p5(ageDistributionSketch, 'age-distribution-holder');
+var myp5 = new p5(countrySketch, 'p5-visualization');
