@@ -129,6 +129,8 @@
     <h2>Highlighted Section</h2>
     <p>This section will highlight a portion of the "population" on the chart.</p>
     <!-- Add more content here -->
+    <!-- Button to toggle between circle and bar chart -->
+    <button id="toggle-chart-button">Toggle Chart</button>
   </div>
 
   <div id="employment" class="section">
@@ -218,7 +220,7 @@
             })
             .attr("r", 0) // Start with zero radius for smooth transition
             .style("fill", "grey")
-            .transition()
+            .transition("appearCircles")
             .duration(100)
             .delay((d, i) => i) // Delay each circle for a staggered effect
             .attr("r", radius); // Transition to the final radius
@@ -227,6 +229,9 @@
           // if scrolled, we should color the circles
           if (scrolled) {
             educationPercentage = data.filter(d => d.Country === selectedCountry)[0].Education / 100;
+
+            // update the title
+            d3.select("#title").text("Young People in " + selectedCountry + " (Education vs Non-Education)");
 
             svg.selectAll("circle")
               .style("fill", (d, i) => {
@@ -282,7 +287,7 @@
           // Update the chart based on the scroll progress
           // Example: Change circle color based on scroll progress
           svg.selectAll("circle")
-            .transition()
+            .transition("colorCircles")
             .duration(500)
             .style("fill", (d, i) => {
               if (scrollProgress >= 0.6) {
@@ -293,7 +298,7 @@
             });
 
           // Show legend if scroll progress exceeds a threshold
-          if (scrollProgress >= 0.6 && scrollProgress < 1) {
+          if (scrollProgress >= 0.6 && scrollProgress < 1 && currentChartType === "circle") {
             d3.select(".legend").style("display", "block");
           } else {
             d3.select(".legend").style("display", "none");
@@ -311,8 +316,12 @@
           // change the title of the chart based on the scroll progress
           if (scrollProgress < 0.6) {
             d3.select("#title").text("Young People in " + selectedCountry);
-          }
-          else if (scrollProgress >= 0.6 && scrollProgress < 1) {
+            if (currentChartType === "bar") {
+              transitionToCircleChart();
+
+              currentChartType = "circle";
+            }
+          } else if (scrollProgress >= 0.6 && scrollProgress < 1) {
             d3.select("#title").text("Young People in " + selectedCountry + " (Education vs Non-Education)");
           } else if (scrollProgressEmployment >= 0.6 && scrollProgressEmployment < 1) {
             d3.select("#title").text("Education vs Employment");
@@ -372,7 +381,7 @@
         const width = document.getElementById("chart").offsetWidth;
         const height = document.getElementById("chart").offsetHeight;
 
-        const margin = { top: 50, right: 50, bottom: 50, left: 50 };
+        const margin = { top: 50, right: 50, bottom: 50, left: 10 };
         const innerWidth = width - margin.left - margin.right;
         const innerHeight = height - margin.top - margin.bottom;
 
@@ -433,25 +442,178 @@
           // Disable scroll event listener during animation
           animationInProgress = true;
 
-          // Update chart
-          updateChart(selectedCountry);
+          // check what type of chart is currently displayed
+          if (currentChartType === "circle") {
+            updateChart(selectedCountry);
+          } else {
+            transitionToBarChart();
+          }
 
-          // Re-enable scroll event listener after animation completes
-          setTimeout(() => {
-            animationInProgress = false;
-          }, 1000); // Adjust timeout as needed based on animation duration
+          animationInProgress = false;
         });
 
-        // wait 1 second before enabling the scroll event listener
-        setTimeout(() => {
-          window.addEventListener('scroll', function () {
-            console.log("Scrolled ", scrolled);
-            if (!animationInProgress) {
-              scrolled = true;
-              handleScroll();
-            }
-          });
-        }, 1000);
+        window.addEventListener('scroll', function () {
+          console.log("Scrolled ", scrolled);
+          if (!animationInProgress) {
+            scrolled = true;
+            handleScroll();
+          }
+        });
+
+        currentChartType = "circle";
+
+        // Add event listener to the button
+        const toggleChartButton = document.getElementById("toggle-chart-button");
+        toggleChartButton.addEventListener("click", function () {
+          // Toggle between circle and bar chart visualizations
+          if (currentChartType === "circle") {
+            transitionToBarChart();
+            currentChartType = "bar";
+          } else {
+            transitionToCircleChart();
+            currentChartType = "circle";
+          }
+        });
+
+        // Function to transition to bar chart
+        function transitionToBarChart() {
+          // remove the elements of the circle chart with a transition
+          svg.selectAll("circle")
+            .transition("removeCircles")
+            .duration(1000)
+            .attr("r", 0)
+            .remove();
+
+          // Set new dimensions for the bar chart SVG
+          const barChartWidth = width / 1.3;
+          const barChartHeight = height / 1.75;
+
+          // Define transition duration
+          const transitionDuration = 1000;
+
+          // Define margins and paddings for the bar chart
+          const barChartMargin = { top: 30, right: 30, bottom: 0, left: 100 };
+          const barChartInnerWidth = barChartWidth - barChartMargin.left - barChartMargin.right;
+          const barChartInnerHeight = barChartHeight - barChartMargin.top - barChartMargin.bottom;
+
+          // Calculate values for the bar chart
+          const educationEmployed = data.filter(d => d.Country === selectedCountry)[0].Education_employed;
+          const educationUnemployed = data.filter(d => d.Country === selectedCountry)[0].Education_unemployed;
+          const educationInactive = data.filter(d => d.Country === selectedCountry)[0].Education_inactive;
+          const notEducationEmployed = data.filter(d => d.Country === selectedCountry)[0].NE_employed;
+          const neet = data.filter(d => d.Country === selectedCountry)[0].NE_neet;
+
+          // sum education unemployed and inactive (converting to number)
+          const educationUnemployedOrInactive = +educationUnemployed + +educationInactive;
+
+          // Group similar categories for better labeling
+          const barChartData = [
+            { category: "Education (Employed)", value: educationEmployed },
+            { category: "Education (Unemployed)", value: educationUnemployedOrInactive },
+            { category: "Not in Education (Employed)", value: notEducationEmployed },
+            { category: "NEET", value: neet }
+          ];
+
+          // Define scales for x and y axes for the bar chart
+          const xScale = d3.scaleBand()
+            .domain(barChartData.map(d => d.category))
+            .range([barChartMargin.left, barChartInnerWidth + barChartMargin.left])
+            .padding(0.2); // Adjust padding for more space between bars
+
+          const yScale = d3.scaleLinear()
+            .domain([0, 100]) // Set the maximum value of the y-axis to 100
+            .nice()
+            .range([barChartInnerHeight + barChartMargin.top, barChartMargin.top]);
+
+          // Remove existing bar chart elements
+          svg.selectAll("rect").remove();
+          svg.selectAll(".bar-text").remove();
+          svg.selectAll(".bar-label").remove(); // Remove existing bar labels
+
+          // Draw bars with transition
+          svg.selectAll("rect")
+            .data(barChartData)
+            .enter().append("rect")
+            .attr("x", d => xScale(d.category))
+            .attr("y", barChartHeight)
+            .attr("width", xScale.bandwidth())
+            .attr("height", 0)
+            .attr("fill", d => {
+              // Color bars based on category
+              if (d.category === "Education (Employed)") {
+                return "orange";
+              } else if (d.category === "Education (Unemployed)") {
+                // lighter shade of orange
+                return "#ffcc80"
+              } else if (d.category === "Not in Education (Employed)") {
+                return "grey";
+              } else {
+                return "lightgrey";
+              }
+            })
+            .transition("growBars")
+            .duration(transitionDuration)
+            .attr("y", d => yScale(d.value))
+            .attr("height", d => barChartHeight - yScale(d.value));
+
+          // Add text labels above bars with transition
+          svg.selectAll(".bar-text")
+            .data(barChartData)
+            .enter().append("text")
+            .attr("class", "bar-text")
+            .attr("x", d => xScale(d.category) + xScale.bandwidth() / 2)
+            .attr("y", barChartHeight)
+            .attr("text-anchor", "middle")
+            .text(d => d.value.toLocaleString() + "%") // Add percentage symbol
+            .transition("growText")
+            .duration(transitionDuration)
+            .attr("y", d => yScale(d.value) - 5);
+
+          // create the x-axis
+          const xAxis = d3.axisBottom(xScale);
+          svg.append("g")
+            .attr("transform", `translate(0, ${barChartHeight})`)
+            .call(xAxis)
+            .selectAll("text")
+            .attr("transform", "rotate(-45)")
+            .attr("text-anchor", "end")
+            .attr("x", -10)
+            .attr("y", 5);
+
+          // create the y-axis
+          const yAxis = d3.axisLeft(yScale);
+          svg.append("g")
+            .attr("transform", `translate(${barChartMargin.left}, 0)`)
+            .call(yAxis);
+        }
+
+        // Function to transition back to circle chart
+        function transitionToCircleChart() {
+          // remove the bar chart elements
+          svg.selectAll("rect")
+            .transition("removeBars")
+            .duration(1000)
+            .attr("y", height)
+            .remove();
+
+          svg.selectAll(".bar-text")
+            .transition("removeText")
+            .duration(1000)
+            .attr("y", height)
+            .remove();
+
+          svg.selectAll(".bar-label")
+            .transition("removeLabels")
+            .duration(1000)
+            .attr("y", height)
+            .remove();
+
+          // turn the x and y axis off
+          svg.selectAll("g").remove();
+
+          // Call the updateChart function to redraw circles
+          updateChart(selectedCountry);
+        }
       });
     });
   </script>
