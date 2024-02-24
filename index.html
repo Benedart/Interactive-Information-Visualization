@@ -12,6 +12,9 @@
       padding: 0;
       overflow-x: hidden;
       /* Disable horizontal scroll */
+
+      background-color: #f4f4f4;
+
     }
 
     .headline {
@@ -171,14 +174,10 @@
       <div id="chart">
         <!-- D3 chart will be rendered here -->
         <p id="title" style="text-align: center;">Young People in OECD</p>
-        <p id="intro" style="text-align: center;">Each circle represents approximately 100,000 young people (age
-          18-24)
-        </p>
       </div>
     </div>
 
   </div>
-
 
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script>
@@ -225,6 +224,13 @@
             .delay((d, i) => i) // Delay each circle for a staggered effect
             .attr("r", radius); // Transition to the final radius
 
+          // add a label sayng that each circle represents 100'000 young people
+          svg.append("text")
+            .attr("x", width / 2)
+            .attr("y", 10)
+            .attr("text-anchor", "middle")
+            .attr("class", "info")
+            .text("Each circle represents 100'000 young people");
 
           // if scrolled, we should color the circles
           if (scrolled) {
@@ -323,8 +329,17 @@
             }
           } else if (scrollProgress >= 0.6 && scrollProgress < 1) {
             d3.select("#title").text("Young People in " + selectedCountry + " (Education vs Non-Education)");
+
+            if (currentChartType === "employment") {
+              transitionToCircleChart();
+
+              currentChartType = "circle";
+            }
           } else if (scrollProgressEmployment >= 0.6 && scrollProgressEmployment < 1) {
             d3.select("#title").text("Education vs Employment");
+
+            // show the bar chart
+            transitionToEmploymentChart();
           } else if (scrollProgressEarnings >= 0.6 && scrollProgressEarnings < 1) {
             d3.select("#title").text("Education vs Earnings");
           } else if (scrollProgressConclusion >= 0.6 && scrollProgressConclusion < 1) {
@@ -445,8 +460,10 @@
           // check what type of chart is currently displayed
           if (currentChartType === "circle") {
             updateChart(selectedCountry);
-          } else {
+          } else if (currentChartType === "bar") {
             transitionToBarChart();
+          } else if (currentChartType === "employment") {
+            transitionToEmploymentChart();
           }
 
           animationInProgress = false;
@@ -469,7 +486,7 @@
           if (currentChartType === "circle") {
             transitionToBarChart();
             currentChartType = "bar";
-          } else {
+          } else if (currentChartType === "bar") {
             transitionToCircleChart();
             currentChartType = "circle";
           }
@@ -483,6 +500,8 @@
             .duration(1000)
             .attr("r", 0)
             .remove();
+
+          svg.selectAll(".info").remove();
 
           // Set new dimensions for the bar chart SVG
           const barChartWidth = width / 1.3;
@@ -585,6 +604,157 @@
           svg.append("g")
             .attr("transform", `translate(${barChartMargin.left}, 0)`)
             .call(yAxis);
+
+          // Add label to the y-axis
+          svg.append("text")
+            .attr("class", "bar-label")
+            .attr("transform", "rotate(-90)")
+            .attr("x", -barChartHeight / 2)
+            .attr("y", 0)
+            .attr("dy", "3em")
+            .style("text-anchor", "middle")
+            .text("Percentage (%)");
+        }
+
+        function transitionToEmploymentChart() {
+          // remove chart elements based on the current chart type
+          if (currentChartType === "circle") {
+            svg.selectAll("circle")
+              .transition("removeCircles")
+              .duration(1000)
+              .attr("r", 0)
+              .remove();
+
+            svg.selectAll(".info").remove();
+          } else if (currentChartType === "bar") {
+            svg.selectAll("rect")
+              .transition("removeBars")
+              .duration(1000)
+              .attr("y", height)
+              .remove();
+
+            svg.selectAll(".bar-text")
+              .transition("removeText")
+              .duration(1000)
+              .attr("y", height)
+              .remove();
+
+            svg.selectAll(".bar-label")
+              .transition("removeLabels")
+              .duration(1000)
+              .attr("y", height)
+              .remove();
+
+            // turn the x and y axis off
+            svg.selectAll("g").remove();
+          }
+
+          // Set new dimensions for the bar chart SVG
+          const barChartWidth = width / 1.3;
+          const barChartHeight = height / 1.75;
+
+          // Define margins and paddings for the bar chart
+          const barChartMargin = { top: 30, right: 30, bottom: 0, left: 100 };
+          const barChartInnerWidth = barChartWidth - barChartMargin.left - barChartMargin.right;
+          const barChartInnerHeight = barChartHeight - barChartMargin.top - barChartMargin.bottom;
+
+          // columns: Below_upper_secondary,Upper_secondary,Tertiary,Shortcycle_tertiary,Bachelor,Master,Doctoral
+          const employmentData = data.filter(d => d.Country === selectedCountry)[0];
+          const belowUpperSecondary = +employmentData.Below_upper_secondary;
+          const upperSecondary = +employmentData.Upper_secondary;
+          const tertiary = +employmentData.Tertiary;
+          const shortCycle = +employmentData.Shortcycle_tertiary;
+          const bachelor = +employmentData.Bachelor;
+          const master = +employmentData.Master;
+          const doctoral = +employmentData.Doctoral;
+
+          // Data for the second bar chart
+          const secondBarChartData = [
+            { category: "Below Upper Secondary Education", value: belowUpperSecondary },
+            { category: "Upper Secondary Education", value: upperSecondary },
+            //  { category: "Tertiary Education", value: tertiary },
+            { category: "Short-cycle Tertiary Education", value: shortCycle },
+            { category: "Bachelor's Degree", value: bachelor },
+            { category: "Master's Degree", value: master },
+            { category: "Doctoral Degree", value: doctoral }
+          ];
+
+          // remove the previous elements
+          svg.selectAll("rect").remove();
+          svg.selectAll(".bar-text").remove();
+          svg.selectAll(".bar-label").remove();
+
+          // Define scales for x and y axes for the second bar chart
+          const xScale = d3.scaleBand()
+            .domain(secondBarChartData.map(d => d.category))
+            .range([barChartMargin.left, barChartInnerWidth + barChartMargin.left])
+            .padding(0.2);
+
+          const yScale = d3.scaleLinear()
+            .domain([0, 100])
+            .nice()
+            .range([barChartInnerHeight + barChartMargin.top, barChartMargin.top]);
+
+          // Draw bars with transition
+          svg.selectAll("rect")
+            .data(secondBarChartData)
+            .enter().append("rect")
+            .attr("x", d => xScale(d.category))
+            .attr("y", barChartHeight)
+            .attr("width", xScale.bandwidth())
+            .attr("height", 0)
+            // colors should be shades of blue from light to dark
+            .attr("fill", (d, i) => {
+              return d3.interpolateOranges(i / secondBarChartData.length);
+            })
+            .transition("growBars")
+            .duration(1000)
+            .attr("y", d => yScale(d.value))
+            .attr("height", d => barChartHeight - yScale(d.value));
+
+          // Add text labels above bars with transition
+          svg.selectAll(".bar-text")
+            .data(secondBarChartData)
+            .enter().append("text")
+            .attr("class", "bar-text")
+            .attr("x", d => xScale(d.category) + xScale.bandwidth() / 2)
+            .attr("y", barChartHeight)
+            .attr("text-anchor", "middle")
+            .text(d => d.value.toLocaleString() + "%")
+            .transition("growText")
+            .duration(1000)
+            .attr("y", d => yScale(d.value) - 5);
+
+          // Create the x-axis
+          const xAxis = d3.axisBottom(xScale);
+          svg.append("g")
+            .attr("class", "x axis")
+            .attr("transform", `translate(0, ${barChartHeight})`)
+            .call(xAxis)
+            .selectAll("text")
+            .attr("transform", "rotate(-45)")
+            .attr("text-anchor", "end")
+            .attr("x", -10)
+            .attr("y", 5);
+
+          // Create the y-axis
+          const yAxis = d3.axisLeft(yScale);
+          svg.append("g")
+            .attr("class", "y axis")
+            .attr("transform", `translate(${barChartMargin.left}, 0)`)
+            .call(yAxis);
+
+          // Add label to the y-axis
+          svg.append("text")
+            .attr("class", "bar-label")
+            .attr("transform", "rotate(-90)")
+            .attr("x", -barChartHeight / 2)
+            .attr("y", 0)
+            .attr("dy", "3em")
+            .style("text-anchor", "middle")
+            .text("Employment Rate (%)");
+
+          currentChartType = "employment";
         }
 
         // Function to transition back to circle chart
@@ -617,7 +787,6 @@
       });
     });
   </script>
-
 </body>
 
 </html>
