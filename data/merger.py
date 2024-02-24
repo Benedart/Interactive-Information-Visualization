@@ -1,12 +1,9 @@
 # Description: Merges the two datasets and saves the result to data/merged.csv
 import pandas as pd
 
-youth = pd.read_csv('data/youth.csv')
-ed_vs_ne = pd.read_csv('data/ed-vs-ne.csv')
+csv1 = pd.read_csv('data/youth_education.csv')
+csv2 = pd.read_csv('data/education-vs-employment.csv')
 
-merged = pd.merge(ed_vs_ne, youth, on='Country', how='left')
-
-# all columns except 'Country' are integers
-merged[merged.columns[1:]] = merged[merged.columns[1:]].astype('Int64')
+merged = pd.merge(csv1, csv2, on='Country', how='left')
 
 merged.to_csv('data/merged.csv', index=False)

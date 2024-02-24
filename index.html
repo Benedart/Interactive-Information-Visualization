@@ -111,6 +111,12 @@
     <!-- Add more content here -->
   </div>
 
+  <div id="focusSection" class="section">
+    <h2>Focus Section</h2>
+    <p>This section will focus on a specific portion of the "population" on the chart.</p>
+    <!-- Add more content here -->
+  </div>
+
   <div id="chart">
     <!-- D3 chart will be rendered here -->
   </div>
@@ -175,6 +181,8 @@
 
           // Calculate the scroll progress based on reaching the second section
           const scrollProgress = Math.max(0, Math.min(1, (scrollTop - sectionOffsetTop + window.innerHeight) / sectionHeight));
+
+          console.log("Scroll Progress: ", scrollProgress);
 
           if (scrollProgress >= 0.5) {
             scrolled = true
