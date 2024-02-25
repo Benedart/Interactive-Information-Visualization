@@ -5,9 +5,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     var selectedCountry = "OECD";
 
-    // import dataset for stats about education vs non-education, the separator is a semicolon
+    // import dataset
     d3.csv("data/merged.csv").then(function (data) {
-        console.log(data);
+        // console.log(data);
 
         const updateChart = (selectedCountry) => {
             // Delete the previous circles with a transition
@@ -43,8 +43,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 .duration(100)
                 .delay((d, i) => i) // Delay each circle for a staggered effect
                 .attr("r", radius); // Transition to the final radius
-
-            console.log("AAAAAAAA", margin)
 
             // add a label to explain the chart
             svg.append("text")
@@ -107,10 +105,10 @@ document.addEventListener("DOMContentLoaded", function () {
             // Calculate the scroll progress based on reaching the fifth section
             const scrollProgressConclusion = Math.max(0, Math.min(1, (scrollTop - sectionConclusionOffsetTop + window.innerHeight) / sectionConclusionHeight));
 
-            console.log("Scroll Progress: ", scrollProgress);
-            console.log("Scroll Progress Employment: ", scrollProgressEmployment);
-            console.log("Scroll Progress Conclusion: ", scrollProgressConclusion);
-            console.log("Current Chart Type: ", currentChartType);
+            // console.log("Scroll Progress: ", scrollProgress);
+            // console.log("Scroll Progress Employment: ", scrollProgressEmployment);
+            // console.log("Scroll Progress Conclusion: ", scrollProgressConclusion);
+            // console.log("Current Chart Type: ", currentChartType);
 
             if (scrollProgress >= 0.6) {
                 scrolled = true
@@ -118,10 +116,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 scrolled = false
             }
 
-            console.log(totalPopulation)
+            // console.log(totalPopulation)
 
             educationPercentage = data.filter(d => d.Country === selectedCountry)[0].Education / 100;
-            console.log("Education Percentage for " + selectedCountry + ":", educationPercentage);
+            // console.log("Education Percentage for " + selectedCountry + ":", educationPercentage);
 
             // Update the chart based on the scroll progress
             svg.selectAll("circle")
@@ -197,6 +195,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (currentChartType !== "circle") {
                     transitionToCircleChart();
 
+
                     currentChartType = "circle";
                 }
             } else if (scrollProgress >= 0.6 && scrollProgress < 1) {
@@ -249,7 +248,7 @@ document.addEventListener("DOMContentLoaded", function () {
         function getPopulation(selectedCountry) {
             const totalPopulation = parseFloat(data.filter(d => d.Country === selectedCountry)[0].Amount);
 
-            console.log("Total Population for " + selectedCountry + ":", totalPopulation);
+            // console.log("Total Population for " + selectedCountry + ":", totalPopulation);
 
             return totalPopulation;
         }
@@ -344,7 +343,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         window.addEventListener('scroll', function () {
-            console.log("Scrolled ", scrolled);
+            // console.log("Scrolled ", scrolled);
             if (!animationInProgress) {
                 scrolled = true;
                 handleScroll();
@@ -489,7 +488,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         function transitionToEmploymentChart() {
-            console.log(currentChartType)
+            // console.log(currentChartType)
             // remove chart elements based on the current chart type
             if (currentChartType === "circle") {
                 svg.selectAll("circle")
@@ -806,6 +805,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Function to transition back to circle chart
         function transitionToCircleChart() {
+            resetButton();
+
             // remove the bar chart elements
             svg.selectAll("rect")
                 .transition("removeBars")
@@ -882,4 +883,10 @@ function updateButton() {
     } else {
         button.innerHTML = "More details";
     }
+}
+
+function resetButton() {
+    // change the text of the button
+    var button = document.getElementById("toggle-chart-button");
+    button.innerHTML = "More details";
 }
