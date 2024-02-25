@@ -1,0 +1,165 @@
+body {
+    font-family: Poppins, sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    /* Disable horizontal scroll */
+
+    padding-bottom: 30%;
+
+
+    background-color: #F8F8FF;
+}
+
+.headline {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: #333;
+    color: #fff;
+    padding: 10px;
+    text-align: center;
+    font-size: 28px;
+    z-index: 1000;
+}
+
+.section {
+    width: 35%;
+    float: none;
+    padding: 20px;
+    padding-left: 5%;
+    height: 1000px;
+    /* Add some height to make scrolling noticeable */
+    margin-top: 90px;
+    /* Adjust for the headline height */
+}
+
+#chart {
+    width: 45%;
+    float: right;
+    position: fixed;
+    padding: 20px;
+    padding-top: 3%;
+    height: 100%;
+    /* Take full height of the viewport */
+    top: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    margin-top: 60px;
+    /* Adjust for the headline height */
+}
+
+svg {
+    width: 100%;
+    height: 100%;
+}
+
+.info {
+    font-size: 14px;
+    text-align: center;
+}
+
+.legend {
+    font-size: 11px;
+    display: none;
+    /* Initially hide the legend */
+}
+
+.country-select {
+    position: fixed;
+    top: 95px;
+    /* Adjust according to your design */
+    left: 45%;
+    /* Adjust according to your design */
+    z-index: 1000;
+}
+
+.select-prompt {
+    position: fixed;
+    top: 50px;
+    /* Adjust according to your design */
+    left: 38%;
+    /* Adjust according to your design */
+    z-index: 1000;
+    background-color: #F8F8FF;
+    padding: 5px;
+}
+
+/* p5.js visualization */
+#p5-visualization {
+    position: fixed;
+    top: 100px;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+    width: 50%;
+    height: 100%;
+    margin-left: 40%;
+    margin-top: 2%;
+    display: none;
+    /* initially hide the p5.js visualization */
+}
+
+.references-box {
+    position: relative;
+    top: 5800px;
+    right: 700px;
+}
+
+.arrow {
+    position: relative;
+    left: 50%;
+    width: 50px;
+    height: 50px;
+    margin-left: -25px;
+}
+
+button {
+    background-color: orange;
+    /* Green */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 12px;
+}
+
+button:hover {
+    background-color: #b37400;
+    color: white;
+}
+
+select {
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+option {
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+input[type=range] {
+    -webkit-appearance: none;
+    width: 30%;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
