@@ -1,0 +1,40 @@
+﻿Country,Earnings_below_upper_secondary,Earnings_tertiary,Earnings_shortcycle_tertiary,Earnings_Bachelor,Earnings_master,Earnings_doctoral,Earnings_upper_secondary
+Australia,89,127,106,127,133,148,
+Austria,77,144,127,104,157,171,
+Belgium,86,142,,127,142,158,
+Canada,79,134,112,141,148,161,110
+Chile,71,241,138,279,299,457,106
+Colombia,71,237,,,,,
+Costa Rica,77,212,138,210,233,339,
+Czechia,67,159,117,131,159,167,100
+Denmark,90,124,110,113,126,144,
+Estonia,92,135,89,132,142,148,
+Finland,100,139,122,122,143,163,105
+France,89,157,129,151,173,189,106
+Germany,72,158,132,152,163,184,
+Greece,81,138,162,132,138,170,
+Hungary,76,179,128,156,183,216,
+Ireland,84,156,123,147,160,184,
+Israel,75,164,117,157,178,206,
+Italy,80,138,,102,138,148,
+Korea,82,132,111,135,140,177,
+Latvia,82,163,157,156,163,170,
+Lithuania,92,180,,167,180,193,105
+Luxembourg,84,151,134,140,153,158,
+Mexico,80,158,117,153,160,308,
+Netherlands,86,149,131,132,150,177,102
+New Zealand,92,128,115,125,130,150,
+Norway,85,119,119,107,119,134,
+Poland,86,157,,140,157,162,
+Portugal,83,171,106,,171,,
+Slovak Republic,82,153,122,126,154,156,
+Slovenia,84,163,131,142,170,183,
+Spain,80,155,112,146,172,185,100
+Sweden,86,126,108,116,130,145,
+Switzerland,80,145,,130,145,162,
+Turkiye,77,153,,,,,
+United Kingdom,73,143,122,139,147,160,
+United States,78,173,110,169,189,221,
+OECD,82,156,122,143,160,188,
+EU25,84,152,125,135,156,171,
+G20,,,,,,,
