@@ -138,7 +138,7 @@
   </div>
 
   <div id="employment" class="section">
-    <h2>Education vs Employment</h2>
+    <h2>Education vs Employment and Earnings</h2>
     <p>This section will highlight the relationship between education and employment.</p>
     <!-- Add more content here -->
 
@@ -189,9 +189,12 @@
         console.log(data);
 
         const updateChart = (selectedCountry) => {
-          // delete the previous circles
           // Delete the previous circles with a transition
           svg.selectAll("circle")
+            .remove();
+
+          // Delete the previous text with a transition
+          svg.selectAll(".info")
             .remove();
 
           // update the chart title
@@ -227,6 +230,14 @@
             .attr("text-anchor", "middle")
             .attr("class", "info")
             .text("Each circle represents 100'000 young people (aged 18-24)");
+
+          // add a label with the total population
+          svg.append("text")
+            .attr("x", width / 2)
+            .attr("y", 30)
+            .attr("text-anchor", "middle")
+            .attr("class", "info")
+            .text("Total Population: " + totalPopulation.toLocaleString() + " young people");
 
           // if scrolled, we should color the circles
           if (scrolled) {
@@ -325,9 +336,9 @@
             }
           } else if (scrollProgressEmployment >= 0.6 && scrollProgressEmployment < 1) {
             if (currentChartType === "employment")
-              d3.select("#title").text("Education vs Employment");
+              d3.select("#title").text("Education vs Employment in " + selectedCountry);
             else if (currentChartType === "earnings")
-              d3.select("#title").text("Education vs Earnings");
+              d3.select("#title").text("Education vs Earnings in " + selectedCountry);
 
 
             // show the bar chart
@@ -920,7 +931,7 @@
             .text("Earnings (%) - Compared to ISCED 3 Earnings");
 
           // change the title of the chart
-          d3.select("#title").text("Education vs Earnings");
+          d3.select("#title").text("Education vs Earnings in " + selectedCountry);
 
           currentChartType = "earnings";
         }
