@@ -52,13 +52,13 @@ var countrySketch = function (p) {
     population = {};
     // get all countries' names
     countries = attainment_table.getColumn("GEO");
-    console.log(countries);
+    // console.log(countries);
     // get all years
     years = attainment_table.columns;
     // remove the first element, which is the name of the country
     years.splice(0, 1);
     // check the years
-    console.log(years);
+    // console.log(years);
     // create an object to store the educational attainment rate for each year
     for (var i = 0; i < years.length; i++) {
       // get the year
@@ -70,9 +70,9 @@ var countrySketch = function (p) {
       // get the population for each year
       population[year] = population_table.getColumn(year).map(Number);
     }
-    console.log("Educational Attainment: ", educational_attainment);
-    console.log("Employment Rate: ", employment_rate);
-    console.log("Population: ", population);
+    // console.log("Educational Attainment: ", educational_attainment);
+    // console.log("Employment Rate: ", employment_rate);
+    // console.log("Population: ", population);
     // Create the year range input
     p.createYearRangeInput();
     // Load flag images
@@ -261,7 +261,7 @@ var countrySketch = function (p) {
     selectedYear = document.getElementById("yearRange").value;
     // update the year label
     document.getElementById("yearLabel").innerHTML = selectedYear;
-    console.log("Selected year: ", selectedYear);
+    // console.log("Selected year: ", selectedYear);
   }
 }
 

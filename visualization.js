@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 .attr("y", 10)
                 .attr("text-anchor", "middle")
                 .attr("class", "info")
-                .text("Each circle represents 100'000 young people (aged 18-24)");
+                .text("Each circle represents " + groupSize.toLocaleString() + " young people (aged 18-24)");
 
             // add a label with the total population
             svg.append("text")
@@ -194,7 +194,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 d3.select("#title").text("Young People in " + selectedCountry);
                 if (currentChartType !== "circle") {
                     transitionToCircleChart();
-
 
                     currentChartType = "circle";
                 }
@@ -488,6 +487,8 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         function transitionToEmploymentChart() {
+            d3.select("#title").text("Education vs Employment in " + selectedCountry);
+
             // console.log(currentChartType)
             // remove chart elements based on the current chart type
             if (currentChartType === "circle") {
@@ -558,6 +559,7 @@ document.addEventListener("DOMContentLoaded", function () {
             svg.selectAll("rect").remove();
             svg.selectAll(".bar-text").remove();
             svg.selectAll(".bar-label").remove();
+            svg.selectAll(".info").remove();
 
             // Define scales for x and y axes for the second bar chart
             const xScale = d3.scaleBand()
@@ -586,7 +588,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 .attr("y", d => yScale(d.value))
                 .attr("height", d => barChartHeight - yScale(d.value));
 
-            // Add text labels above bars with transition
+            // Add text labels above bars with transition, if value is 0, we should say M* and not show the bar
             svg.selectAll(".bar-text")
                 .data(secondBarChartData)
                 .enter().append("text")
@@ -594,10 +596,21 @@ document.addEventListener("DOMContentLoaded", function () {
                 .attr("x", d => xScale(d.category) + xScale.bandwidth() / 2)
                 .attr("y", barChartHeight)
                 .attr("text-anchor", "middle")
-                .text(d => d.value.toLocaleString() + "%")
+                .text(d => {
+                    if (d.value === 0) return "M*";
+                    return d.value.toLocaleString() + "%";
+                })
                 .transition("growText")
                 .duration(1000)
                 .attr("y", d => yScale(d.value) - 5);
+
+            // add info
+            svg.append("text")
+                .attr("x", width / 2)
+                .attr("y", 10)
+                .attr("text-anchor", "middle")
+                .attr("class", "info")
+                .text("M* - Missing Data");
 
             // Create the x-axis
             const xAxis = d3.axisBottom(xScale);
@@ -632,6 +645,8 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         function transitionToEarningsChart() {
+            d3.select("#title").text("Education vs Earnings in " + selectedCountry);
+
             // remove chart elements based on the current chart type
             if (currentChartType === "circle") {
                 svg.selectAll("circle")
@@ -690,7 +705,7 @@ document.addEventListener("DOMContentLoaded", function () {
             // Data for the second bar chart
             const earningsChartData = [
                 { category: "Below Upper Secondary Education", value: earningsBelowUpperSecondary },
-                { category: "Upper Secondary Education", value: earningsUpperSecondary },
+                // { category: "Upper Secondary Education", value: earningsUpperSecondary },
                 //    { category: "Tertiary Education", value: earningsTertiary },
                 { category: "Short-cycle Tertiary Education", value: earningsShortCycle },
                 { category: "Bachelor's Degree", value: earningsBachelor },
@@ -702,6 +717,7 @@ document.addEventListener("DOMContentLoaded", function () {
             svg.selectAll(".bar-text").remove();
             svg.selectAll(".bar-label").remove();
             svg.selectAll("rect").remove();
+            svg.selectAll(".info").remove();
 
             // Define scales for x and y axes for the second bar chart
             const xScale = d3.scaleBand()
@@ -749,17 +765,38 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
 
             // Add text labels above bars with transition
+            // // labels for missing data should be M*
             svg.selectAll(".bar-text")
                 .data(earningsChartData)
                 .enter().append("text")
                 .attr("class", "bar-text")
                 .attr("x", d => xScale(d.category) + xScale.bandwidth() / 2)
-                .attr("y", d => yScale(Math.max(100, d.value)) - 5) // Adjust y position for labels
+                .attr("y", d => yScale(Math.max(100, d.value))) // Adjust y position for text labels
                 .attr("text-anchor", "middle")
-                .text(d => d.value.toLocaleString() + "%")
+                .text(d => {
+                    if (d.value === 0) return "M*";
+                    return d.value.toLocaleString() + "%";
+                })
                 .transition("growText")
                 .duration(1000)
-                .attr("y", d => yScale(Math.max(100, d.value)) - 5);
+                .attr("y", d => yScale(Math.max(100, d.value)) - 5); // Adjust y position for text labels
+
+
+            // add a info label
+            svg.append("text")
+                .attr("x", width / 2)
+                .attr("y", 10)
+                .attr("text-anchor", "middle")
+                .attr("class", "info")
+                .text("Earnings for each education level compared to ISCED 3 Earnings (100%)");
+
+            // missing data
+            svg.append("text")
+                .attr("x", width / 2)
+                .attr("y", 30)
+                .attr("text-anchor", "middle")
+                .attr("class", "info")
+                .text("M* - Missing Data");
 
             // Create the x-axis on the 100 baseline
             const xAxis = d3.axisBottom(xScale);
